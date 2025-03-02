@@ -43,11 +43,34 @@ xmu
 */
 
 #include <iostream>
+#include <vector>
+
+#define N_MAX 40
 
 using namespace std;
 
+typedef short idxT;
+typedef int valT;
+typedef int cntT;
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    cntT q=0;
+    cin>>q;
+    vector<valT> A= {1,2};
+    while(q-->0)
+    {
+        idxT N=0;
+        cin>>N;
+        if((N>0)&&(N<=N_MAX))
+        {
+            if(A.size()<(size_t)(N))
+                for(idxT i=(idxT)(A.size()); i<N; ++i)
+                    A.push_back(A[i-1]+A[i-2]);
+            cout<<A[N-1]<<endl;
+        }
+        else
+            cout<<"ERROR"<<endl;
+    }
     return 0;
 }
