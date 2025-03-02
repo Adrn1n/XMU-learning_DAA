@@ -34,11 +34,65 @@
 */
 
 #include <iostream>
+#include <vector>
+#include <queue>
 
 using namespace std;
 
+typedef int idxT;
+typedef long long valT;
+typedef vector<valT> val_vec;
+typedef pair<idxT,idxT> PII;
+
+valT getMax_matFixedPath(vector<val_vec> A)
+{
+    valT res=0;
+    if(!A.empty())
+    {
+        idxT n=(idxT)(A.size()),m=(idxT)(A[0].size());
+        for(const auto &a:A)
+            if(a.size()!=(size_t)m)
+                return res;
+        queue<PII> que_idx;
+        do
+        {
+            PII idx= {m-1,n-1};
+            if(!que_idx.empty())
+            {
+                idx=que_idx.front(),que_idx.pop();
+                valT *p=&A[idx.first][idx.second];
+                if(idx.first<m-1)
+                    if(idx.second<n-1)
+                        *p+=max(A[idx.first+1][idx.second],A[idx.first][idx.second+1]);
+                    else
+                        *p+=A[idx.first+1][idx.second];
+                else
+                    *p+=A[idx.first][idx.second+1];
+            }
+            if(idx.first>0)
+                que_idx.emplace(idx.first-1,idx.second);
+            if((idx.first==m-1)&&(idx.second>0))
+                que_idx.emplace(idx.first,idx.second-1);
+        }
+        while(!que_idx.empty());
+        res=A[0][0];
+    }
+    return res;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT m=0,n=0;
+    cin>>m>>n;
+    if((m>0)&&(n>0))
+    {
+        vector<val_vec> A(m,val_vec(n));
+        for(auto &a:A)
+            for(auto &b:a)
+                cin>>b;
+        cout<<getMax_matFixedPath(A)<<endl;
+    }
+    else
+        cout<<"ERROR"<<endl;
     return 0;
 }
