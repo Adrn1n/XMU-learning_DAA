@@ -40,11 +40,62 @@
 */
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
+typedef short idxT;
+typedef int valT;
+
+idxT getMax_groupSumLe(vector<valT> A,const valT s_max)
+{
+    idxT num=0;
+    if(!A.empty())
+    {
+        bool flag=true;
+        for(const auto &a:A)
+            if(a>s_max)
+            {
+                flag=false;
+                break;
+            }
+        if(flag)
+        {
+            sort(A.begin(),A.end(),greater<valT>());
+            vector<vector<valT>> Group;
+            for(const auto &a:A)
+                if(Group.empty())
+                    Group.push_back({a,a});
+                else
+                {
+                    auto it=Group.begin();
+                    while((it!=Group.end())&&(((*it).front()+a)>s_max))
+                        ++it;
+                    if(it==Group.end())
+                        Group.push_back({a,a});
+                    else
+                        (*it).front()+=a,(*it).push_back(a);
+                }
+            num=(idxT)(Group.size());
+        }
+    }
+    return num;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT N=0;
+    valT W=0;
+    cin>>N>>W;
+    if(N>0)
+    {
+        vector<valT> A(N);
+        for(auto &a:A)
+            cin>>a;
+        cout<<getMax_groupSumLe(A,W)<<endl;
+    }
+    else
+        cout<<"ERROR"<<endl;
     return 0;
 }
