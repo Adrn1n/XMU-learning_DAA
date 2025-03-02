@@ -37,11 +37,60 @@
 */
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
+typedef int idxT;
+typedef long long valT;
+typedef pair<valT,valT> PVV;
+
+idxT getN_mostCommon(vector<PVV> A)
+{
+    idxT res=0;
+    if(!A.empty())
+    {
+        bool flag=true;
+        for(const auto &a:A)
+            if(a.first>a.second)
+            {
+                flag=false;
+                break;
+            }
+        if(flag)
+        {
+            sort(A.begin(),A.end(),[](const PVV &a,const PVV &b)
+            {
+                return a.first<b.first;
+            });
+            for(auto it1=A.begin(); it1!=A.end(); ++res)
+            {
+                auto it2=it1+1;
+                for(; (it2!=A.end())&&((*it2).first<=(*it1).second); ++it2);
+                it1=it2;
+            }
+        }
+    }
+    return res;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT N=0;
+    cin>>N;
+    if(N>0)
+    {
+        vector<PVV> A(N);
+        for(auto &a:A)
+        {
+            cin>>a.first>>a.second;
+            if(a.first>a.second)
+                swap(a.first,a.second);
+        }
+        cout<<getN_mostCommon(A)<<endl;
+    }
+    else
+        cout<<"ERROR"<<endl;
     return 0;
 }
