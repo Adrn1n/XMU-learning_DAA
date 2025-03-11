@@ -120,7 +120,7 @@ int main()
 {
     idxT n=0;
     cin>>n;
-    if(n<=N_MAX)
+    if((n>0)&&(n<=N_MAX))
     {
         vector<valT> A(n);
         for(auto &a:A)

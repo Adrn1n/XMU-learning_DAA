@@ -32,11 +32,77 @@
 */
 
 #include <iostream>
+#include <vector>
+#include <queue>
+#include <utility>
+#include <algorithm>
+
+#define n_MAX 100000
 
 using namespace std;
 
+typedef int idxT;
+typedef long long valT;
+
+typedef struct mSortNode_
+{
+    vector<valT>::iterator Start,End;
+} mSortNode;
+
+valT mergeSort(vector<valT> A)
+{
+    valT invsN=0;
+    if(!A.empty())
+    {
+        queue<idxT> divQue;
+        divQue.push((idxT)(A.size()));
+        for(idxT tmp=0; (tmp=divQue.front())>1; divQue.pop(),divQue.push(tmp>>1),divQue.push(tmp-(tmp>>1)));
+        queue<mSortNode> srtdQue;
+        for(auto it=A.begin(); !divQue.empty(); divQue.pop())
+        {
+            idxT tmp=divQue.front();
+            if(tmp>1)
+            {
+                if(*it>*(it+1))
+                    swap(*it,*(it+1)),++invsN;
+                srtdQue.push({it,it+=2});
+            }
+            else
+                srtdQue.push({it,++it});
+        }
+        for(mSortNode node1,node2; node1=srtdQue.front(),srtdQue.pop(),!srtdQue.empty(); srtdQue.pop())
+        {
+            node2=srtdQue.front();
+            vector<valT> tmp(node2.End-node1.Start);
+            auto it=tmp.begin(),it1=node1.Start,it2=node2.Start;
+            while((it1<node1.End)&&(it2<node2.End))
+                if(*it1>*it2)
+                    *it++=*it2++,invsN+=(node1.End-it1);
+                else
+                    *it++=*it1++;
+            while(it1<node1.End)
+                *it++=*it1++;
+            while(it2<node2.End)
+                *it++=*it2++;
+            copy(tmp.begin(),tmp.end(),node1.Start);
+            srtdQue.push({node1.Start,node2.End});
+        }
+    }
+    return invsN;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT n=0;
+    cin>>n;
+    if((n>0)&&(n<=n_MAX))
+    {
+        vector<valT> A(n);
+        for(auto &a:A)
+            cin>>a;
+        cout<<mergeSort(A)<<endl;
+    }
+    else
+        cout<<"ERROR"<<endl;
     return 0;
 }
