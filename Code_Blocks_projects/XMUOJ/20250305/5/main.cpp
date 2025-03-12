@@ -31,11 +31,98 @@ xmu
 */
 
 #include <iostream>
+#include <vector>
+#include <queue>
 
 using namespace std;
 
+typedef long long idxT;
+typedef long long valT;
+
+typedef struct freqNode_
+{
+    valT val;
+    idxT cnt;
+    vector<valT>::iterator Start,End;
+} freqNode;
+
+valT getMoreHalf_freq(vector<valT> A)
+{
+    freqNode node= {0};
+    if(!A.empty())
+    {
+        queue<idxT> divdQue;
+        divdQue.push((idxT)(A.size()));
+        for(idxT tmp=0; (tmp=divdQue.front())>1; divdQue.pop(),divdQue.push(tmp>>1),divdQue.push(tmp-(tmp>>1)));
+        queue<freqNode> freqQue;
+        for(auto it=A.begin(); !divdQue.empty(); divdQue.pop())
+        {
+            idxT tmp=divdQue.front();
+            if(tmp>1)
+                if(*it==*(it+1))
+                    freqQue.push({*it,tmp,it,it+=2});
+                else
+                    freqQue.push({0,0,it,it+=2});
+            else
+                freqQue.push({*it,1,it,++it});
+        }
+        for(freqNode tmp= {0}; node=freqQue.front(),freqQue.pop(),!freqQue.empty(); freqQue.pop())
+        {
+            tmp=freqQue.front();
+            if((node.cnt>0)&&(tmp.cnt>0))
+            {
+                if(node.val==tmp.val)
+                {
+                    freqQue.push({node.val,node.cnt+tmp.cnt,node.Start,tmp.End});
+                    continue;
+                }
+                else
+                {
+                    if(node.cnt>tmp.cnt)
+                        tmp.cnt=0;
+                    else if(node.cnt<tmp.cnt)
+                        node.cnt=0;
+                    else
+                        node.cnt=tmp.cnt=0;
+                }
+            }
+            if(node.cnt>0)
+            {
+                for(auto it=tmp.Start; it<tmp.End; ++it)
+                    if(*it==node.val)
+                        ++node.cnt;
+                if(node.cnt>((tmp.End-node.Start)>>1))
+                {
+                    freqQue.push({node.val,node.cnt,node.Start,tmp.End});
+                    continue;
+                }
+            }
+            else if(tmp.cnt>0)
+            {
+                for(auto it=node.Start; it<node.End; ++it)
+                    if(*it==tmp.val)
+                        ++tmp.cnt;
+                if(tmp.cnt>((tmp.End-node.Start)>>1))
+                {
+                    freqQue.push({tmp.val,tmp.cnt,node.Start,tmp.End});
+                    continue;
+                }
+            }
+            freqQue.push({0,0,node.Start,tmp.End});
+        }
+    }
+    return node.val;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    valT val=0;
+    vector<valT> A;
+    while(cin>>val)
+        A.push_back(val);
+    if(A.empty())
+        cout<<"ERROR"<<endl;
+    else
+        cout<<getMoreHalf_freq(A)<<endl;
     return 0;
 }
