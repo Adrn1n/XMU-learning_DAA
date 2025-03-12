@@ -28,10 +28,36 @@
 
 #include <iostream>
 
+#define N_MAX 50
+
 using namespace std;
+
+typedef short idxT;
+typedef unsigned long long cntT;
+
+inline cntT getDiff_N(idxT &n)
+{
+    if(n>1)
+    {
+        cntT cnt=3<<1,nConsidHT=3<<1;
+        n-=2;
+        while((n--)>0)
+            nConsidHT<<=1,cnt=nConsidHT-cnt;
+        return cnt;
+    }
+    else if(n==1)
+        return 3;
+    else
+        return 0;
+}
 
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT N=0;
+    while(cin>>N)
+        if((N>0)&&(N<=N_MAX))
+            cout<<getDiff_N(N)<<endl;
+        else
+            cout<<"ERROR!"<<endl;
     return 0;
 }
