@@ -45,10 +45,42 @@ xmu
 
 #include <iostream>
 
+#define T_MAX 1000
+#define idx_MAX 1000000000000000000
+#define N_MAX FFFFFFFFFFFFFFFF
+
 using namespace std;
+
+typedef long long idxT;
+typedef short cntT;
+
+idxT getN_S(const idxT &L,const idxT &R)
+{
+    idxT cnt=0;
+    idxT l=L,r=R;
+    while(l<r)
+    {
+        idxT len=r-l,oddN=(len>>1)+(len%2)*((l+1)%2);
+        cnt+=((oddN>>1)+(oddN%2)*(((l+1)%2)*(((l+2)%4)>>1)+(l%2)*((l%4)>>1))),l>>=1,r>>=1;
+    }
+    return cnt;
+}
 
 int main()
 {
-    cout << "Hello world!" << endl;
+    cntT T=0;
+    cin>>T;
+    if((T>0)&&(T<=T_MAX))
+        while(T--)
+        {
+            idxT L=0,R=0;
+            cin>>L>>R;
+            if((L<=R)&&(L>=1)&&(R<=idx_MAX))
+                cout<<getN_S(L-1,R)<<endl;
+            else
+                cout<<"ERROR!"<<endl;
+        }
+    else
+        cout<<"ERROR!"<<endl;
     return 0;
 }

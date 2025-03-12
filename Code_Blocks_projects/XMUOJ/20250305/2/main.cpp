@@ -43,15 +43,16 @@ using namespace std;
 
 typedef int idxT;
 typedef long long valT;
+typedef long long cntT;
 
 typedef struct mSortNode_
 {
     vector<valT>::iterator Start,End;
 } mSortNode;
 
-valT mergeSort(vector<valT> A)
+cntT mergeSort(vector<valT> A)
 {
-    valT invsN=0;
+    cntT invsN=0;
     if(!A.empty())
     {
         queue<idxT> divQue;
