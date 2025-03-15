@@ -27,11 +27,32 @@
 */
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
+typedef long long idxT;
+typedef long long valT;
+
+valT getDup_val(vector<valT> A)
+{
+    if(!A.empty())
+    {
+        sort(A.begin(),A.end());
+        for(auto it=A.begin(); it<(A.end()-1); ++it)
+            if(*it==*(it+1))
+                return *it;
+    }
+    return 0;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    valT a=0;
+    vector<valT> A;
+    while(cin>>a)
+        A.push_back(a);
+    cout<<getDup_val(A)<<endl;
     return 0;
 }
