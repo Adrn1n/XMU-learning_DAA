@@ -25,11 +25,32 @@
 */
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
+typedef long long valT;
+
+valT getMax_SubArr(const vector<valT> &A)
+{
+    valT res=0;
+    if(!A.empty())
+    {
+        valT max2=0;
+        res=A.front();
+        for(auto &a:A)
+            max2=max(max2+a,a),res=max(res,max2);
+    }
+    return res;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    vector<valT> A;
+    valT a;
+    while(cin>>a)
+        A.push_back(a);
+    cout<<getMax_SubArr(A)<<endl;
     return 0;
 }
