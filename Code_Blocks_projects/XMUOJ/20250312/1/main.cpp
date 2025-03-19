@@ -35,7 +35,7 @@ using namespace std;
 typedef long long idxT;
 typedef long long valT;
 
-valT getDup_val(vector<valT> A)
+inline valT getDup_val(vector<valT> A)
 {
     if(!A.empty())
     {
