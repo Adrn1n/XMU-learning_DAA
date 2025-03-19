@@ -25,11 +25,45 @@
 */
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
+
+#define n_MAX 15
+#define baseMeth_N 3
 
 using namespace std;
 
+typedef short idxT;
+typedef int cntT;
+
+cntT getMeth_cnt(const idxT n,const idxT k)
+{
+    cntT cnt=0;
+    if((n>0)&&(k>0))
+    {
+        vector<cntT> A;
+        for(idxT i=0; i<n; ++i)
+        {
+            if(i<k)
+                cnt=1;
+            else
+                cnt=0;
+            auto maxStep=min(i,k);
+            for(idxT j=0; j<maxStep; ++j)
+                cnt+=A[i-1-j];
+            A.push_back(cnt);
+        }
+    }
+    return cnt;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT n=0;
+    cin>>n;
+    if(n<=n_MAX)
+        cout<<getMeth_cnt(n,baseMeth_N)<<endl;
+    else
+        cout<<"ERROR!"<<endl;
     return 0;
 }
