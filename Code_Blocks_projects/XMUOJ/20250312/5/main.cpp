@@ -29,11 +29,109 @@ true
 */
 
 #include <iostream>
+#include <vector>
+#include <numeric>
+//#include <set>
+#include <stack>
 
 using namespace std;
 
+typedef long long valT;
+
+typedef struct recurNode_
+{
+    vector<valT>::const_iterator it;
+    bool chose,done;
+} recurNode;
+
+//bool canDividSameS2(const vector<valT> &A)
+//{
+//    if(!A.empty())
+//    {
+//        valT S=accumulate(A.begin(),A.end(),(valT)0);
+//        if(S%2)
+//            return false;
+//        else
+//        {
+//            S>>=1;
+//            set<valT> allPosiSum= {0};
+//            for(auto &a:A)
+//            {
+//                set<valT> Tmp;
+//                for(auto &s:allPosiSum)
+//                    if(a>S)
+//                        break;
+//                    else
+//                    {
+//                        valT val=a+s;
+//                        if(val==S)
+//                            return true;
+//                        else if(val<S)
+//                            Tmp.insert(val);
+//                    }
+//                allPosiSum.insert(Tmp.begin(),Tmp.end());
+//            }
+//        }
+//    }
+//    return false;
+//}
+
+bool canDividSameS2(const vector<valT> &A)
+{
+    if(!A.empty())
+    {
+        valT S=accumulate(A.begin(),A.end(),(valT)0);
+        if(S%2)
+            return false;
+        else
+        {
+            valT val=0;
+            stack<recurNode> recurStack;
+            S>>=1,recurStack.push({A.begin(),true,false}),val+=A.front();
+            while(!recurStack.empty())
+                if(val>S)
+                {
+                    val-=*((recurStack.top()).it),recurStack.pop();
+                    if(!recurStack.empty())
+                        (recurStack.top()).done=true;
+                }
+                else if(val<S)
+                {
+                    recurNode &node=recurStack.top();
+                    if(node.done)
+                        if(node.chose)
+                            node.chose=false,node.done=false,val-=*(node.it);
+                        else
+                        {
+                            recurStack.pop();
+                            if(!recurStack.empty())
+                                (recurStack.top()).done=true;
+                        }
+                    else
+                    {
+                        if(node.it<(A.end()-1))
+                            recurStack.push({node.it+1,true,false}),val+=*(node.it+1);
+                        else
+                        {
+                            recurStack.pop();
+                            if(!recurStack.empty())
+                                (recurStack.top()).done=true;
+                        }
+                    }
+                }
+                else
+                    return true;
+        }
+    }
+    return false;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    vector<valT> A;
+    valT a=0;
+    while(cin>>a)
+        A.push_back(a);
+    cout<<(canDividSameS2(A)?"true":"false")<<endl;
     return 0;
 }
