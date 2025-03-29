@@ -27,11 +27,45 @@
 */
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
+typedef long long idxT;
+typedef long long valT;
+
+idxT getMax_incrsSubArrLen(vector<valT> &A)
+{
+    if(!A.empty())
+    {
+        vector<idxT> Len(A.size());
+        Len.front()=1;
+        for(idxT i=1; (size_t)i<A.size(); ++i)
+        {
+            idxT maxLen=1;
+            for(idxT j=0; j<i; ++j)
+                if(A[i]>A[j])
+                    maxLen=max(maxLen,Len[j]+1);
+            Len[i]=maxLen;
+        }
+        return *max_element(Len.begin(),Len.end());
+    }
+    return 0;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT n=0;
+    cin>>n;
+    if(n>0)
+    {
+        vector<valT> A(n);
+        for(auto &a:A)
+            cin>>a;
+        cout<<getMax_incrsSubArrLen(A)<<endl;
+    }
+    else
+        cout<<"ERROR!"<<endl;
     return 0;
 }
