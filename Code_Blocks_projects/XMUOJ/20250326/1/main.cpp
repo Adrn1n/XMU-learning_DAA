@@ -35,11 +35,45 @@ abedc
 */
 
 #include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
+typedef long long idxT;
+typedef vector<idxT> idxVec;
+
+inline idxT get_LCS(string &A,string &B)
+{
+    idxT LCS=0;
+    if((!A.empty())&&(!B.empty()))
+    {
+        auto len1=A.size(),len2=B.size();
+        vector<idxVec> Tmp(2,idxVec(len1));
+        for(idxT i=0; (size_t)i<len2; ++i)
+            for(idxT j=0; (size_t)j<len1; ++j)
+            {
+                if(A[j]==B[i])
+                    LCS=1;
+                else
+                    LCS=0;
+                if(j)
+                    Tmp[i%2][j]=max({Tmp[(i+1)%2][j-1]+LCS,Tmp[(i+1)%2][j],Tmp[i%2][j-1]});
+                else
+                    Tmp[0][0]=LCS;
+            }
+        LCS=Tmp[(len2-1)%2].back();
+    }
+    return LCS;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT N=0,M=0;
+    cin>>N>>M;
+    string A,B;
+    cin>>A>>B;
+    cout<<get_LCS(A,B)<<endl;
     return 0;
 }
