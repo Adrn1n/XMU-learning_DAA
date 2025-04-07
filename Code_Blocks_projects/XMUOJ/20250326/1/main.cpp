@@ -72,8 +72,13 @@ int main()
 {
     idxT N=0,M=0;
     cin>>N>>M;
-    string A,B;
-    cin>>A>>B;
-    cout<<get_LCS(A,B)<<endl;
+    if((N>0)&&(M>0))
+    {
+        string A,B;
+        cin>>A>>B;
+        cout<<get_LCS(A,B)<<endl;
+    }
+    else
+        cout<<"ERROR!"<<endl;
     return 0;
 }

@@ -44,11 +44,51 @@
 */
 
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
+typedef short idxT;
+typedef long long valT;
+typedef vector<valT> valVec;
+
+idxT build_PascalTriangle(valVec &A)
+{
+    idxT idx=0;
+    if(!A.empty())
+    {
+        valVec B(A.size());
+        vector<valVec *> Tmp(2);
+        if(A.size()%2)
+            Tmp[0]=&A,Tmp[1]=&B;
+        else
+            Tmp[0]=&B,Tmp[1]=&A;
+        for(; (size_t)idx<A.size(); ++idx)
+            for(auto i=0; i<=idx; ++i)
+                if(i)
+                    if(i==idx)
+                        (*Tmp[idx%2])[idx]=1;
+                    else
+                        (*Tmp[idx%2])[i]=(*Tmp[(idx+1)%2])[i-1]+(*Tmp[(idx+1)%2])[i];
+                else
+                    (*Tmp[idx%2])[0]=1;
+    }
+    return idx;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT rowIndex=0;
+    cin>>rowIndex;
+    if(rowIndex>=0)
+    {
+        valVec A(rowIndex+1);
+        build_PascalTriangle(A);
+        for(auto &a:A)
+            cout<<a<<' ';
+        cout<<endl;
+    }
+    else
+        cout<<"ERROR!"<<endl;
     return 0;
 }
