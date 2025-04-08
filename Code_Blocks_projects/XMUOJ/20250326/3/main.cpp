@@ -45,11 +45,52 @@ true
 */
 
 #include <iostream>
+#include <string>
+#include <set>
+#include <algorithm>
 
 using namespace std;
 
+typedef string::const_iterator strCIt;
+
+inline bool ifDictCatS(const string &S,const set<string> &Dict)
+{
+    if((!S.empty())&&(!Dict.empty()))
+    {
+        set<strCIt> A;
+        do
+        {
+            auto it=S.begin();
+            if(!A.empty())
+                it=*A.begin(),A.erase(A.begin());
+            for(auto &s:Dict)
+                if((size_t)(distance(it,S.end()))>=s.size())
+                    if(equal(it,it+(long long)(s.size()),s.begin()))
+                    {
+                        if((it+=(long long)(s.size()))==S.end())
+                            return true;
+                        else
+                            A.insert(it);
+                    }
+        }
+        while(!A.empty());
+    }
+    return false;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    string s,tmp;
+    cin>>s;
+    if(!s.empty())
+    {
+        set<string> wordDict;
+        while(cin>>tmp)
+            wordDict.insert(tmp);
+        if(ifDictCatS(s,wordDict))
+            cout<<"true"<<endl;
+        else
+            cout<<"false"<<endl;
+    }
     return 0;
 }

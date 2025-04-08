@@ -52,7 +52,7 @@ typedef short idxT;
 typedef long long valT;
 typedef vector<valT> valVec;
 
-idxT build_PascalTriangle(valVec &A)
+inline idxT build_PascalTriangle(valVec &A)
 {
     idxT idx=0;
     if(!A.empty())
