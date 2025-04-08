@@ -39,11 +39,38 @@
 */
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
+typedef long long valT;
+
+inline valT getMax_nAdjSum(const vector<valT> &A)
+{
+    valT Sum=0;
+    if(!A.empty())
+    {
+        vector<valT> Tmp(A.size());
+        auto it2=Tmp.begin();
+        for(auto it1=A.begin(); it1<A.end(); ++it1,++it2)
+            if(it1==A.begin())
+                *it2=*it1;
+            else if(it1==A.begin()+1)
+                *it2=max(*it1,*(it1-1));
+            else
+                *it2=max(*(it2-1),*(it2-2)+*it1);
+        Sum=Tmp.back();
+    }
+    return Sum;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    valT val=0;
+    vector<valT> A;
+    while(cin>>val)
+        A.push_back(val);
+    cout<<getMax_nAdjSum(A)<<endl;
     return 0;
 }
