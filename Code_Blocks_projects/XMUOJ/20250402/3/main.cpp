@@ -58,11 +58,61 @@
 */
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
+typedef long long valT;
+typedef vector<valT>::const_iterator valVec_cIt;
+
+inline valT getMin_Delta(const valVec_cIt Start,const valVec_cIt End)
+{
+    valT minDelta=0,maxVal=0;
+    if((End-Start)>1)
+    {
+        minDelta=Start[1]-Start[0],maxVal=*Start;
+        for(auto it=Start+2; it<End; ++it)
+            maxVal=max(maxVal,*(it-1)),minDelta=min(minDelta,*it-maxVal);
+    }
+    return minDelta;
+}
+
+inline valT getMax_2NOvrlapDelta(const vector<valT> &A)
+{
+    valT res=0;
+    if(A.size()>1)
+    {
+        valT MaxDelta_cur=res=A[1]-A[0],MaxDelta_min=0;
+        auto Start=A.begin(),End=A.begin()+2,minIt=A.begin();
+        for(auto it=A.begin()+2; it<A.end(); ++it)
+        {
+            auto tmp=*(it-1);
+            if(*minIt>=tmp)
+            {
+                if(*minIt>tmp)
+                    minIt=it-1;
+                MaxDelta_min=MaxDelta_cur;
+            }
+            if((*it-(*minIt))>=MaxDelta_cur)
+            {
+                if((*it-(*minIt))>MaxDelta_cur)
+                    Start=minIt;
+                MaxDelta_cur=*it-(*minIt),End=it+1;
+            }
+            res=max({res,*it-(*minIt),MaxDelta_min+(*it)-(*minIt)});
+        }
+        res=max(res,MaxDelta_cur-getMin_Delta(Start,End));
+    }
+    return res;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    valT val=0;
+    vector<valT> A;
+    while(cin>>val)
+        A.push_back(val);
+    cout<<max(getMax_2NOvrlapDelta(A),(valT)0)<<endl;
     return 0;
 }
