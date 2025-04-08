@@ -44,11 +44,53 @@
 */
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
+typedef long long valT;
+typedef vector<valT> valVec;
+
+inline valT getMax_cntusMultiply(const valVec &A)
+{
+    valT res=0;
+    if(!A.empty())
+    {
+        vector<valVec> Tmp(2,valVec(A.size()));
+        for(auto it=A.begin(); it<A.end(); ++it)
+            if(it==A.begin())
+                if(*it>0)
+                    Tmp[0][0]=res=*it;
+                else
+                    Tmp[1][0]=res=*it;
+            else
+            {
+                auto idx=it-A.begin();
+                auto val0=Tmp[0][idx-1],val1=Tmp[1][idx-1];
+                if(*it>0)
+                {
+                    if(!val0)
+                        val0=1;
+                }
+                else
+                {
+                    swap(val0,val1);
+                    if(!val1)
+                        val1=1;
+                }
+                Tmp[0][idx]=*it*val0,Tmp[1][idx]=*it*val1,res=max(res,Tmp[0][idx]);
+            }
+    }
+    return res;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    valT val=0;
+    valVec A;
+    while(cin>>val)
+        A.push_back(val);
+    cout<<getMax_cntusMultiply(A)<<endl;
     return 0;
 }
