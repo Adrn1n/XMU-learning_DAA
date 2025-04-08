@@ -29,11 +29,57 @@ xyzzyx
 */
 
 #include <iostream>
+#include <string>
+#include <vector>
 
 using namespace std;
 
+typedef short idxT;
+typedef string::const_iterator strCIt;
+typedef vector<idxT> idxVec;
+
+inline idxT getMax_PalindromeLen(strCIt &Start,const strCIt End)
+{
+    idxT len=0;
+    if(Start<End)
+    {
+        auto resIt=Start;
+        vector<idxVec> A(End-Start);
+        A[0].push_back(len=1);
+        for(auto it=Start+1; it<End; ++it)
+        {
+            auto idx=(idxT)(it-Start);
+            for(auto &l:A[idx-1])
+            {
+                auto it1=it-1-l;
+                if((it1>=Start)&&(*it1==*it))
+                {
+                    auto len1=(idxT)(l+2);
+                    A[idx].push_back(len1);
+                    if(len1>len)
+                        len=len1,resIt=it-(len-1);
+                }
+            }
+            if(*it==*(it-1))
+            {
+                A[idx].push_back(2);
+                if(len<2)
+                    len=2,resIt=it-(len-1);
+            }
+            A[idx].push_back(1);
+        }
+        Start=resIt;
+    }
+    return len;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    string s;
+    cin>>s;
+    strCIt Start=s.begin();
+    for(auto len=getMax_PalindromeLen(Start,s.end()); len; --len)
+        cout<<Start[len-1];
+    cout<<endl;
     return 0;
 }
