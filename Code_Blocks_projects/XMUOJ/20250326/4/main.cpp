@@ -37,11 +37,31 @@
 */
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
+typedef long long valT;
+
+inline valT getMax_delta(const vector<valT> &A)
+{
+    valT maxDelta=0,minVal=0;
+    if(A.size()>1)
+    {
+        maxDelta=A[1]-A[0],minVal=A.front();
+        for(auto it=A.begin()+2; it<A.end(); ++it)
+            minVal=min(minVal,*(it-1)),maxDelta=max(maxDelta,*it-minVal);
+    }
+    return maxDelta;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    valT val=0;
+    vector<valT> A;
+    while(cin>>val)
+        A.push_back(val);
+    cout<<max(getMax_delta(A),0ll)<<endl;
     return 0;
 }
