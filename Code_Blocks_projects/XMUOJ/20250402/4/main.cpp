@@ -42,11 +42,48 @@
 */
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
+typedef long long valT;
+typedef vector<valT> valVec;
+
+inline valT getMax_nAdjCircSum(const valVec &A)
+{
+    valT Sum=0;
+    auto len=A.size();
+    if(len>2)
+    {
+        vector<valVec> Tmp(2,valVec(len));
+        auto it2=Tmp[0].begin(),it3=Tmp[1].begin();
+        for(auto it1=A.begin(); it1<A.end(); ++it1,++it2,++it3)
+            if(it1==A.begin())
+                *it2=*it1;
+            else if(it1==A.begin()+1)
+                *it2=max(*it1,*(it1-1)),*it3=*it1;
+            else
+            {
+                *it2=max(*(it2-1),*(it2-2)+*it1);
+                if(it1==A.begin()+2)
+                    *it3=max(*it1,*(it1-1));
+                else
+                    *it3=max(*(it3-1),*(it3-2)+*it1);
+            }
+        Sum=max(Tmp[0][len-2],A.back()+Tmp[1][len-3]);
+    }
+    else if(!A.empty())
+        Sum=*max_element(A.begin(),A.end());
+    return Sum;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    valT val=0;
+    valVec A;
+    while(cin>>val)
+        A.push_back(val);
+    cout<<getMax_nAdjCircSum(A)<<endl;
     return 0;
 }

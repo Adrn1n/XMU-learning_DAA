@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1744128081 source:e:\files\xmu\learning\daa\code_blocks_projects\xmuoj\20250402\4\main.cpp
+	<iostream>
+	<vector>
+	<algorithm>
+
