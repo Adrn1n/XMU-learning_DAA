@@ -48,11 +48,83 @@ xmu
 */
 
 #include <iostream>
+#include <vector>
+#include <map>
+
+#define PRICE 5
 
 using namespace std;
 
+typedef long long idxT;
+typedef short valT;
+typedef map<valT,idxT> walletT;
+
+const valT AllPays[3]= {5,10,20};
+
+inline bool makeBestChange(walletT &wallet,valT val)
+{
+    for(auto it=wallet.rbegin(); (it!=wallet.rend())&&(val>0); ++it)
+        if(((it->first)<=val)&&((it->second>0)))
+            val-=(it->first),--(it->second);
+    return !val;
+}
+
+inline bool can_makeChangeAll(const vector<valT> &Pays,const valT price)
+{
+    if(Pays.empty())
+        return true;
+    else
+    {
+        walletT Wallet;
+        bool flag=true;
+        for(auto &pay:Pays)
+        {
+            ++Wallet[pay];
+            auto rest=(valT)(pay-price);
+            if(rest>0)
+            {
+                if(!(flag=makeBestChange(Wallet,rest)))
+                    break;
+            }
+            else if(rest<0)
+            {
+                flag=false;
+                break;
+            }
+        }
+        return flag;
+    }
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT N=0;
+    cin>>N;
+    bool flag=true;
+    if(N>0)
+    {
+        vector<valT> Pays(N);
+        for(auto &a:Pays)
+        {
+            cin>>a;
+            if((a!=*AllPays)&&(a!=AllPays[1])&&(a!=AllPays[2]))
+            {
+                flag=false;
+                break;
+            }
+        }
+        if(flag)
+        {
+            flag=false;
+            if(can_makeChangeAll(Pays,PRICE))
+                cout<<"true"<<endl;
+            else
+                cout<<"false"<<endl;
+        }
+        else
+            flag=true;
+    }
+    if(flag)
+        cout<<"ERROR!"<<endl;
     return 0;
 }
