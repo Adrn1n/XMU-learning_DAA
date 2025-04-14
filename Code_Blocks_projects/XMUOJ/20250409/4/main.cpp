@@ -37,11 +37,57 @@ xmu
 */
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cstdlib>
+
+#define k 2
+#define N_MAX 100
 
 using namespace std;
 
+typedef short idxT;
+typedef long long valT;
+typedef vector<valT> valVec;
+
+inline valT getMin_assign2Cost(vector<valVec> &Costs)
+{
+    valT res=0;
+    if(!Costs.empty())
+    {
+        sort(Costs.begin(),Costs.end(),[](const valVec &vec1,const valVec &vec2)
+        {
+            return abs(vec1[1]-vec1[0])>abs(vec2[1]-vec2[0]);
+        });
+        auto it=Costs.begin();
+        idxT cnt1=0,cnt2=0,len=(idxT)(Costs.size()>>1);
+        for(; (it<Costs.end())&&(cnt1<len)&&(cnt2<len); ++it)
+            if((*it)[0]<(*it)[1])
+                res+=(*it)[0],++cnt1;
+            else
+                res+=(*it)[1],++cnt2;
+        while(it<Costs.end())
+            if(cnt1<len)
+                res+=(*it++)[0];
+            else
+                res+=(*it++)[1];
+    }
+    return res;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT N=0;
+    cin>>N;
+    if((N>0)&&(N<=N_MAX))
+    {
+        vector<valVec> costs(k*N,valVec(k));
+        for(auto &vec:costs)
+            for(auto &val:vec)
+                cin>>val;
+        cout<<getMin_assign2Cost(costs)<<endl;
+    }
+    else
+        cout<<"ERROR!"<<endl;
     return 0;
 }
