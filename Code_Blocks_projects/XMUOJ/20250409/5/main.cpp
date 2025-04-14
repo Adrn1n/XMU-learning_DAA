@@ -34,11 +34,64 @@ xmu
 */
 
 #include <iostream>
+#include <string>
+#include <algorithm>
+
+#define N_MAX 1000
 
 using namespace std;
 
+typedef short idxT;
+
+inline bool isStrNO(const string &s)
+{
+    if(s.empty())
+        return false;
+    else
+    {
+        for(auto &c:s)
+            if((c<'0')||(c>'9'))
+                return false;
+        return s[0]!='0';
+    }
+}
+
+inline string getMinVal_rmKDigs(const string &NO,const idxT k)
+{
+    string res;
+    if((isStrNO(NO))&&(k>=0)&&((size_t)k<NO.size()))
+    {
+        auto l=(idxT)(NO.size()-k);
+        auto End=NO.rend();
+        while(l-->0)
+        {
+            auto tmp=min_element(NO.rbegin()+l,End);
+            for(auto it=tmp+1; it<End; ++it)
+                if(*it==*tmp)
+                    tmp=it;
+            if((!res.empty())||(*tmp!='0'))
+                res.push_back(*tmp);
+            End=tmp;
+        }
+        if(res.empty())
+            res.push_back('0');
+    }
+    return res;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT k=0;
+    cin>>k;
+    bool flag=true;
+    if((k>=0)&&(k<N_MAX))
+    {
+        string NO;
+        cin>>NO;
+        if(isStrNO(NO)&&((size_t)k<NO.size()))
+            cout<<getMinVal_rmKDigs(NO,k)<<endl,flag=false;
+    }
+    if(flag)
+        cout<<"ERROR!"<<endl;
     return 0;
 }
