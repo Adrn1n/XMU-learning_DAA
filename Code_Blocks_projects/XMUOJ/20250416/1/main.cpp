@@ -38,11 +38,44 @@ xmu
 */
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
+typedef long long valT;
+
+inline valT getMax_S(const vector<valT> &A)
+{
+    valT res=0;
+    if(!A.empty())
+    {
+        auto it1=A.begin(),it2=A.end()-1;
+        while(it1<it2)
+        {
+            res=max(res,(it2-it1)*max(min(*it1,*it2),0ll));
+            auto it=it1;
+            if(*it1>*it2)
+            {
+                for(it=it2; (it>it1)&&(*it<=*it2); --it);
+                it2=it;
+            }
+            else
+            {
+                for(; (it<it2)&&(*it<=*it1); ++it);
+                it1=it;
+            }
+        }
+    }
+    return res;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    valT val=0;
+    vector<valT> height;
+    while(cin>>val)
+        height.push_back(val);
+    cout<<getMax_S(height)<<endl;
     return 0;
 }
