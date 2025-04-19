@@ -47,11 +47,50 @@ xmu
 */
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
+typedef long long idxT;
+
+inline bool isReachable_all(const vector<idxT> &A)
+{
+    if(A.empty())
+        return true;
+    else
+    {
+        auto Start=A.begin(),End=Start+1,maxReach=Start;
+        do
+        {
+            for(auto it=Start; it<End; ++it)
+                if(it+(*it)<(A.end()-1))
+                    maxReach=max({maxReach,it+(*it),it});
+                else
+                    return true;
+            Start=End,End=maxReach+1;
+        }
+        while(Start<End);
+        return false;
+    }
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT val=0;
+    vector<idxT> nums;
+    bool flag=true;
+    while(cin>>val)
+        if(val>=0)
+            nums.push_back(val);
+        else
+            cout<<"ERROR!"<<endl,flag=false;
+    if(flag)
+    {
+        if(isReachable_all(nums))
+            cout<<"true"<<endl;
+        else
+            cout<<"false"<<endl;
+    }
     return 0;
 }
