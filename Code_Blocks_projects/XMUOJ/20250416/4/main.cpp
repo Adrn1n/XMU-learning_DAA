@@ -51,11 +51,41 @@ xmu
 */
 
 #include <iostream>
+#include <string>
 
 using namespace std;
 
+inline bool isPalindrome_rmMax1(const string &S)
+{
+    if(S.empty())
+        return true;
+    else
+    {
+        bool flag=false;
+        for(auto Start1=S.begin(),Start2=Start1,End1=S.end()-1,End2=End1; Start1<End1;)
+            if(*Start1==*End1)
+                ++Start1,--End1;
+            else
+            {
+                if(flag)
+                    if((Start1-S.begin())>(S.end()-1-End1))
+                        Start1=Start2,End1=End2;
+                    else
+                        return false;
+                else
+                    Start2=Start1++,End2=End1-1,flag=true;
+            }
+        return true;
+    }
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    string s;
+    cin>>s;
+    if(isPalindrome_rmMax1(s))
+        cout<<"true"<<endl;
+    else
+        cout<<"false"<<endl;
     return 0;
 }
