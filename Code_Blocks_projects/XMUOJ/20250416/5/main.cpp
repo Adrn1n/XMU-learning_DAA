@@ -57,11 +57,103 @@ xmu
 */
 
 #include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
 
 using namespace std;
 
+typedef long long valT;
+typedef short restT;
+
+typedef struct nodeT_
+{
+    string val;
+    restT rest;
+    bool flag;
+} nodeT;
+
+inline string buildRes_nodeArr(const vector<nodeT> &A)
+{
+    string res;
+    for(auto it=A.begin(); it<A.end(); ++it)
+        if(it->flag)
+        {
+            if((res.empty())&&(!stoll(it->val)))
+            {
+                res="0";
+                break;
+            }
+            else
+                res+=it->val;
+        }
+    return res;
+}
+
+inline string getMax_numDiv3InVec_nOrd(const vector<valT> &A)
+{
+    string res;
+    if(!A.empty())
+    {
+        vector<nodeT> Arr;
+        restT Rest=0;
+        for(auto it=A.begin(); it<A.end(); ++it)
+            if(*it>=0)
+            {
+                string val;
+                restT rest=0;
+                for(valT a=*it,tmp=0; a>0; a/=10)
+                    val+=(char)('0'+(tmp=a%10)),rest=(restT)((rest+tmp)%3);
+                if(val.empty())
+                    val="0";
+                reverse(val.begin(),val.end()),Rest=(restT)((Rest+rest)%3);
+                Arr.push_back({val,rest,true});
+            }
+        if(!Arr.empty())
+        {
+            sort(Arr.begin(),Arr.end(),[](const nodeT &a,const nodeT &b)
+            {
+                return a.val>b.val;
+            });
+            if(!Rest)
+                res=buildRes_nodeArr(Arr);
+            else
+            {
+                bool flag=false;
+                auto it=Arr.rbegin();
+                for(; it<Arr.rend(); ++it)
+                    if(it->rest==Rest)
+                    {
+                        it->flag=false,flag=true;
+                        break;
+                    }
+                if(flag)
+                    res=buildRes_nodeArr(Arr),it->flag=true,it=Arr.rbegin(),flag=false;
+                for(restT cnt=0; it<Arr.rend(); ++it)
+                    if(it->rest==(3-Rest))
+                    {
+                        if(cnt)
+                        {
+                            it->flag=false,flag=true;
+                            break;
+                        }
+                        else
+                            it->flag=false,cnt=1;
+                    }
+                if(flag)
+                    res=max(res,buildRes_nodeArr(Arr));
+            }
+        }
+    }
+    return res;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    valT val=0;
+    vector<valT> digits;
+    while(cin>>val)
+        digits.push_back(val);
+    cout<<getMax_numDiv3InVec_nOrd(digits)<<endl;
     return 0;
 }
