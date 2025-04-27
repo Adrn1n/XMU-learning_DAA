@@ -62,11 +62,71 @@ xmu
 */
 
 #include <iostream>
+#include <vector>
+#include <forward_list>
 
 using namespace std;
 
+typedef long long idxT;
+
+inline idxT get_allInNOut(const vector<forward_list<idxT>> &adjList)
+{
+    idxT res=-1;
+    if(!adjList.empty())
+    {
+        bool flag=false;
+        for(auto it1=adjList.begin(); it1<adjList.end(); ++it1)
+            if((*it1).empty())
+            {
+                if(flag)
+                {
+                    res=-1,flag=false;
+                    break;
+                }
+                else
+                    res=it1-adjList.begin(),flag=true;
+            }
+        if(flag)
+        {
+            for(auto it1=adjList.begin(); it1<adjList.end(); ++it1,flag=true)
+                if(it1-adjList.begin()==res)
+                    continue;
+                else
+                {
+                    for(auto &vert:*it1)
+                        if(vert==res)
+                        {
+                            flag=false;
+                            break;
+                        }
+                    if(flag)
+                    {
+                        res=-1;
+                        break;
+                    }
+                }
+        }
+    }
+    return res;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT n=0;
+    cin>>n;
+    if(n>0)
+    {
+        vector<forward_list<idxT>> adjList(n);
+        idxT a=0,b=0;
+        while(cin>>a>>b)
+            if((a>0)&&(a<=n)&&(b>0)&&(b<=n))
+                adjList[a-1].push_front(b-1);
+            else
+                cout<<"ERROR!"<<endl;
+        auto res=get_allInNOut(adjList);
+        if(res>=0)
+            ++res;
+        cout<<res<<endl;
+    }
     return 0;
 }
