@@ -59,11 +59,63 @@ xmu
 */
 
 #include <iostream>
+#include <vector>
+#include <forward_list>
+#include <queue>
 
 using namespace std;
 
+typedef long long idxT;
+
+enum vertTraverseState {n_visit,visit,proced};
+
+inline bool has_loop(const vector<forward_list<idxT>> &adjList)
+{
+    if(!adjList.empty())
+    {
+        vector<vertTraverseState> state(adjList.size(),n_visit);
+        for(idxT i=0; (size_t)i<adjList.size(); ++i)
+            if(!state[i])
+            {
+                state[i]=visit;
+                queue<idxT> verts;
+                idxT j=i;
+                do
+                {
+                    if(!verts.empty())
+                        j=verts.front(),verts.pop();
+                    for(auto &k:adjList[j])
+                        if(state[k]==visit)
+                            return true;
+                        else
+                            state[k]=visit,verts.push(k);
+                }
+                while(!verts.empty());
+                for(auto it=state.begin(); it<state.end(); ++it)
+                    if(*it==visit)
+                        *it=proced;
+            }
+    }
+    return false;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT numCourses=0;
+    cin>>numCourses;
+    if(numCourses>0)
+    {
+        vector<forward_list<idxT>> prerequisites(numCourses);
+        idxT a=0,b=0;
+        while(cin>>a>>b)
+            if((a>=0)&&(a<numCourses)&&(b>=0)&&(b<numCourses))
+                prerequisites[a].push_front(b);
+            else
+                cout<<"ERROR!"<<endl;
+        if(has_loop(prerequisites))
+            cout<<"false"<<endl;
+        else
+            cout<<"true"<<endl;
+    }
     return 0;
 }
