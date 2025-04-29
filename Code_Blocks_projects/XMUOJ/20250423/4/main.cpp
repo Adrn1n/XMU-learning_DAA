@@ -49,11 +49,77 @@ xmu
 */
 
 #include <iostream>
+#include <vector>
+#include <forward_list>
+#include <algorithm>
+#include <utility>
 
 using namespace std;
 
+typedef long long idxT;
+typedef long long cntT;
+
+typedef forward_list<idxT> idxLList;
+typedef pair<idxT,cntT> PIC;
+
+inline PIC getVert_maxDegre(const vector<idxLList> &adjList)
+{
+    PIC res= {-1,0};
+    if(!adjList.empty())
+    {
+        cntT tmp=0;
+        for(auto it1=adjList.begin(); it1<adjList.end(); ++it1,tmp=0)
+        {
+            for(auto it2=it1->begin(); it2!=it1->end(); ++it2,++tmp);
+            if(tmp>res.second)
+                res= {it1-adjList.begin(),tmp};
+        }
+    }
+    return res;
+}
+
+inline bool rmVert(vector<idxLList> &adjList,const idxT vert)
+{
+    if((vert>=0)&&(adjList.size()>(size_t)vert))
+    {
+        adjList.erase(adjList.begin()+vert);
+        for(auto it1=adjList.begin(); it1<adjList.end(); ++it1)
+            for(auto it2=it1->before_begin(),it3=it1->begin(); it3!=it1->end(); ++it2,++it3)
+                if(*it3==vert)
+                {
+                    it1->erase_after(it2);
+                    break;
+                }
+        return true;
+    }
+    else
+        return false;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT n=0;
+    cin>>n;
+    if(n>0)
+    {
+        vector<idxLList> adjList(n);
+        idxT a=0,b=0;
+        while(cin>>a>>b)
+            if((a>=0)&&(a<n)&&(b>=0)&&(b<n)&&(find(adjList[a].begin(),adjList[a].end(),b)==adjList[a].end())&&(find(adjList[b].begin(),adjList[b].end(),a)==adjList[b].end()))
+                adjList[a].push_front(b),adjList[b].push_front(a);
+            else
+                cout<<"ERROR!"<<endl;
+        auto tmp=getVert_maxDegre(adjList);
+        if((tmp.first)>=0)
+        {
+            auto res=tmp.second;
+            rmVert(adjList,tmp.first),tmp=getVert_maxDegre(adjList);
+            if((tmp.first)>=0)
+                res+=(tmp.second);
+            cout<<res<<endl;
+        }
+        else
+            cout<<"ERROR!"<<endl;
+    }
     return 0;
 }
