@@ -46,11 +46,89 @@ xmu
 */
 
 #include <iostream>
+#include <sstream>
+#include <vector>
+#include <queue>
+
+#define moveN 4
 
 using namespace std;
 
+typedef long long idxT;
+typedef long long valT;
+
+typedef vector<idxT> idxVec;
+
+struct queNode
+{
+    idxT i,j,dist;
+};
+
+const idxT Move[moveN][2]= {{0,-1},{0,1},{-1,0},{1,0}};
+
+inline idxT getMax_incrsPathLen(const vector<idxVec> &A)
+{
+    idxT res=0;
+    if(!A.empty())
+    {
+        vector<vector<bool>> nVisit;
+        bool flag=true;
+        for(auto &a:A)
+            if(!a.empty())
+                nVisit.emplace_back(a.size(),true);
+            else
+            {
+                flag=false;
+                break;
+            }
+        if(flag)
+            for(idxT i=0; (size_t)i<A.size(); ++i)
+                for(idxT j=0; (size_t)j<(A[i].size()); ++j)
+                    if(nVisit[i][j])
+                    {
+                        queue<queNode> que;
+                        que.push({i,j,0}),nVisit[i][j]=false;
+                        auto maxVal=A[i][j];
+                        for(auto p=i; (size_t)p<A.size(); ++p)
+                            for(auto q=j; (size_t)q<(A[p].size()); ++q)
+                                if((nVisit[p][q])&&(A[p][q]>=maxVal))
+                                {
+                                    if(A[p][q]>maxVal)
+                                        queue<queNode>().swap(que),maxVal=A[p][q];
+                                    que.push({p,q,0});
+                                }
+                        while(!que.empty())
+                        {
+                            auto node=que.front(),tmp=node;
+                            que.pop();
+                            for(size_t k=0; k<moveN; tmp=node,++k)
+                                if(((tmp.i+=Move[k][0])>=0)&&((size_t)(tmp.i)<A.size())&&((tmp.j+=Move[k][1])>=0)&&((size_t)(tmp.j)<(A[tmp.i].size()))&&(A[tmp.i][tmp.j]<A[node.i][node.j]))
+                                    ++(tmp.dist),que.push(tmp),nVisit[tmp.i][tmp.j]=false,res=(res<(tmp.dist))?(tmp.dist):res;
+                        }
+                    }
+    }
+    return res;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT m=0,n=0;
+    cin>>m>>ws;
+    if(m>0)
+    {
+        vector<idxVec> A(m);
+        for(auto &vec:A)
+        {
+            valT val=0;
+            string line_in;
+            if(getline(cin,line_in))
+            {
+                stringstream ss(line_in);
+                while(ss>>val)
+                    vec.push_back(val);
+            }
+        }
+        cout<<getMax_incrsPathLen(A)+1<<endl;
+    }
     return 0;
 }
