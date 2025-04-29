@@ -45,11 +45,76 @@ xmu
 */
 
 #include <iostream>
+#include <utility>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
+typedef long long idxT;
+
+typedef pair<idxT,idxT> PII;
+typedef vector<idxT> idxVec;
+
+inline PII getLast_unDirTre_more1edge(const vector<PII> &Edges)
+{
+    PII res= {0,0};
+    if(!Edges.empty())
+    {
+        vector<idxVec> conetComps;
+        bool flag=true;
+        for(auto it=Edges.begin(); (it<Edges.end())&&flag; ++it)
+            if((it->first)==(it->second))
+                res=*it,flag=false;
+            else
+            {
+                auto it1=conetComps.begin(),it2=it1;
+                for(bool flag1=true,flag2=flag1; ((it1<conetComps.end())&&(it2<conetComps.end()))&&(flag1||flag2);)
+                {
+                    if(flag1)
+                    {
+                        if(find(it1->begin(),it1->end(),it->first)!=it1->end())
+                            flag1=false;
+                        else
+                            ++it1;
+                    }
+                    if(flag2)
+                    {
+                        if(find(it2->begin(),it2->end(),it->second)!=it2->end())
+                            flag2=false;
+                        else
+                            ++it2;
+                    }
+                }
+                if((it1==conetComps.end())&&(it2==conetComps.end()))
+                    conetComps.push_back({it->first,it->second});
+                else if(it1==conetComps.end())
+                    it2->push_back(it->first);
+                else if(it2==conetComps.end())
+                    it1->push_back(it->second);
+                else
+                {
+                    if(it1==it2)
+                        res=*it,flag=false;
+                    else
+                    {
+                        for(auto it3=it2->begin(); it3<it2->end(); ++it3)
+                            it1->push_back(*it3);
+                        conetComps.erase(it2);
+                    }
+                }
+            }
+    }
+    return res;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    vector<PII> Edges;
+    PII edge;
+    while(cin>>edge.first>>edge.second)
+        Edges.push_back(edge);
+    edge=getLast_unDirTre_more1edge(Edges);
+    cout<<edge.first<<' '<<edge.second<<endl;
     return 0;
 }
