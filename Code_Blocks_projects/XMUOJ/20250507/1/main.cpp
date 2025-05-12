@@ -42,11 +42,185 @@ xmu
 */
 
 #include <iostream>
+#include <vector>
+#include <utility>
+#include <stack>
+
+#define MAX_IDX 100
+#define MOV_DIM 2
+#define MOV_N 2
 
 using namespace std;
 
+typedef long long idxT;
+typedef short valT1;
+typedef bool valT2;
+typedef short movIdxT;
+
+typedef pair<idxT,idxT> PII;
+typedef vector<valT2> valT2Vec;
+
+struct stakNode
+{
+    PII loc;
+    movIdxT idx;
+};
+
+enum search_state {stop,init,extend};
+
+const idxT Mov[MOV_DIM][MOV_N]= {{0,1},{1,0}};
+
+inline search_state extendLoc(vector<valT2Vec> &A,stakNode &node)
+{
+    search_state state=stop;
+    auto &loc=node.loc;
+    if((loc.first>=0)&&((size_t)(loc.first)<(A.size()))&&(loc.second>=0)&&((size_t)(loc.second)<(A[loc.first].size())))
+        for(movIdxT i=node.idx; i<MOV_N; ++i)
+        {
+            loc.first+=Mov[0][i],loc.second+=Mov[1][i];
+            bool flag=false;
+            if((loc.first>=0)&&((size_t)(loc.first)<A.size())&&(loc.second>=0)&&((size_t)(loc.second)<(A[loc.first].size()))&&A[loc.first][loc.second])
+                flag=true;
+            loc.first-=Mov[0][i],loc.second-=Mov[1][i];
+            if(flag)
+            {
+                A[loc.first][loc.second]=A[loc.first+Mov[0][i]][loc.second+Mov[1][i]]=false,node.idx=i,state=init;
+                break;
+            }
+        }
+    return state;
+}
+
+inline idxT getMax_cntProc(vector<valT2Vec> &A)
+{
+    idxT res=0;
+    search_state state=init;
+    stakNode firstNode= {{0,0},0};
+    bool flag0=true;
+    idxT ext_size=1;
+    while(state!=stop)
+    {
+        stack<stakNode> Stak;
+        idxT cnt=0;
+        do
+        {
+            stakNode node= {{0,-1},0};
+            auto &nodeLoc=node.loc;
+            bool flag1=false;
+            if((state==extend)&&(Stak.size()<=(size_t)ext_size)&&(Stak.empty()||(!A[((Stak.top()).loc).first][((Stak.top()).loc).second])))
+            {
+                node=firstNode;
+                if(Stak.size()<(size_t)ext_size)
+                {
+                    node.idx=0;
+                    for(auto i=firstNode.idx+1;; ++i)
+                        if(i<MOV_N)
+                        {
+                            if(A[nodeLoc.first+Mov[0][i]][nodeLoc.second+Mov[1][i]])
+                            {
+                                auto tmp=node;
+                                (tmp.loc).first+=Mov[0][i],(tmp.loc).second+=Mov[1][i],tmp.idx=0;
+                                if(extendLoc(A,tmp)!=stop)
+                                    Stak.push(tmp),cnt+=2,flag1=true;
+                                if(!flag0)
+                                    ++ext_size;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            if(!flag0)
+                                --ext_size,flag0=flag1=true;
+                            break;
+                        }
+                    if(flag1)
+                        continue;
+                    else
+                        break;
+                }
+                else
+                    flag1=true;
+            }
+            if(!flag1)
+            {
+                if(!Stak.empty())
+                    node=Stak.top();
+                flag1=true;
+            }
+            if((Stak.empty())||(!A[(node.loc).first][(node.loc).second]))
+            {
+                for(++(nodeLoc.second),(node.idx)=0; flag1&&((size_t)(nodeLoc.first)<A.size()); nodeLoc.second=0,++(nodeLoc.first))
+                    for(; (size_t)(nodeLoc.second)<(A[nodeLoc.first].size()); ++(nodeLoc.second))
+                        if((A[nodeLoc.first][nodeLoc.second])&&(extendLoc(A,node)!=stop))
+                        {
+                            if(flag0)
+                                firstNode=node,flag0=false;
+                            Stak.push(node),cnt+=2,flag1=false;
+                            break;
+                        }
+            }
+            else
+            {
+                ++node.idx;
+                if(extendLoc(A,node)!=stop)
+                    Stak.top()=node,flag1=false;
+            }
+            if(flag1)
+            {
+                if(res<cnt)
+                    res=cnt;
+                if(Stak.empty())
+                    state=stop;
+                else
+                {
+                    if(A[((Stak.top()).loc).first][((Stak.top()).loc).second])
+                        cnt-=2,Stak.pop();
+                    if(!Stak.empty())
+                    {
+                        auto &tmp=(Stak.top()).loc;
+                        A[tmp.first+Mov[0][(Stak.top()).idx]][tmp.second+Mov[1][(Stak.top()).idx]]=A[tmp.first][tmp.second]=true;
+                    }
+                }
+            }
+        }
+        while(!Stak.empty());
+        if((state==init)&&(!flag0))
+            state=extend;
+        else
+            break;
+    }
+    return res;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT n=0,m=0;
+    cin>>n>>m;
+    if((n>0)&&(n<=MAX_IDX)&&(m>0)&&(m<=MAX_IDX))
+    {
+        vector<valT2Vec> A(n,valT2Vec(m));
+        valT1 val=0;
+        for(auto &vec:A)
+            for(auto a:vec)
+            {
+                cin>>val;
+                switch(val)
+                {
+                case 1:
+                {
+                    a=true;
+                    break;
+                }
+                case -1:
+                {
+                    a=false;
+                    break;
+                }
+                default:
+                    cout<<"ERROR!"<<endl;
+                }
+            }
+        cout<<getMax_cntProc(A)<<endl;
+    }
     return 0;
 }
