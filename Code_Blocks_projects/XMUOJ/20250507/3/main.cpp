@@ -35,11 +35,80 @@ xmu
 */
 
 #include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+
+#define MAX_LEN 4
 
 using namespace std;
 
+typedef short idxT;
+typedef char valT;
+typedef short cntT;
+
+typedef vector<valT> valVec;
+
+const vector<valVec> Dict= {{},{'a','b','c'},{'d','e','f'},{'g','h','i'},{'j','k','l'},{'m','n','o'},{'p','q','r','s'},{'t','u','v'},{'w','x','y','z'}};
+
+inline vector<idxT> str2idxVec(const string &S)
+{
+    vector<idxT> A;
+    for(auto &c:S)
+        A.push_back((valT)(c-'0'));
+    return A;
+}
+
+inline cntT repeatValVec(vector<valVec> &A,const cntT k)
+{
+    cntT cnt=0;
+    auto len=A.size();
+    while(++cnt<k)
+//        A.insert(A.end(),A.begin(),A.begin()+(_Bit_const_iterator::difference_type)len); // macOS 和 Linux 都可按照意思正确执行, 但是 Windows 就不行; OJ 提交错误也应该与此有关
+        for(size_t i=0; i<len; ++i)
+            A.push_back(A[i]);
+    return cnt;
+}
+
+inline vector<valVec> getAll_posiCombine(const vector<idxT> &A)
+{
+    vector<valVec> Res;
+    for(auto it=A.rbegin(); it<A.rend(); ++it)
+        if(((*it)>0)&&((*it<=9)))
+        {
+            auto len=Res.size();
+            if(len>0)
+            {
+                repeatValVec(Res,(cntT)(Dict[(*it)-1].size()));
+                for(cntT i=0; (size_t)i<Dict[(*it)-1].size(); ++i)
+                    for(auto j=0; (size_t)j<len; ++j)
+                        Res[i*len+j].push_back(Dict[(*it)-1][i]);
+            }
+            else
+                for(cntT i=0; (size_t)i<Dict[(*it)-1].size(); ++i)
+                    Res.push_back({Dict[*(it)-1][i]});
+        }
+    for(auto &res:Res)
+        reverse(res.begin(),res.end());
+    return Res;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    string S;
+    while(cin>>S)
+        if(S.size()<=MAX_LEN)
+            break;
+        else
+            cout<<"ERROR!"<<endl;
+    auto A=str2idxVec(S);
+    auto Res=getAll_posiCombine(A);
+    for(auto &res:Res)
+    {
+        for(auto &c:res)
+            cout<<c;
+        cout<<' ';
+    }
+    cout<<endl;
     return 0;
 }
