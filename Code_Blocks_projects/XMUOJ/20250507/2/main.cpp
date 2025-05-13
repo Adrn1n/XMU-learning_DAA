@@ -65,11 +65,80 @@ xmu
 */
 
 #include <iostream>
+#include <utility>
+#include <vector>
+#include <stack>
+
+#define MAX_N 18
+#define MAX_VAL 78
 
 using namespace std;
 
+typedef short idxT;
+typedef short valT;
+
+typedef pair<valT,valT> PVV;
+
+struct stakNode
+{
+    idxT a,b;
+    bool isOver;
+};
+
+inline bool canRm_2elm(const PVV &a,const PVV &b)
+{
+    return (a.first==b.first)||(a.second==b.second);
+}
+
+inline bool allCan_1stRmLastRmAll(const vector<PVV> &A)
+{
+    stack<stakNode> Stak;
+    stakNode node= {0,0,false};
+    vector<bool> Used(A.size());
+    do
+    {
+        if((!Stak.empty())&&((Stak.top()).isOver))
+            node=Stak.top(),Used[node.a]=Used[node.b]=node.isOver=false,Stak.pop();
+        bool flag=true;
+        for(++(node.b); (size_t)(node.a)<(A.size()-1); ++(node.a),node.b=(idxT)(node.a+1))
+            if(!(Used[node.a]))
+                for(; (size_t)(node.b)<A.size(); ++node.b)
+                    if((!Used[node.b])&&canRm_2elm(A[node.a],A[node.b]))
+                    {
+                        Used[node.a]=Used[node.b]=true,Stak.push(node),flag=false;
+                        break;
+                    }
+        if(flag&&(!Stak.empty()))
+        {
+            if((Stak.size())%2)
+                node=Stak.top(),Used[node.a]=Used[node.b]=false,Stak.pop();
+            if(Stak.empty())
+                return false;
+            else
+                (Stak.top()).isOver=true;
+        }
+    }
+    while(!Stak.empty());
+    return true;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT N=0;
+    cin>>N;
+    if((N>0)&&(N<=MAX_N))
+    {
+        vector<PVV> A(N);
+        for(auto &p:A)
+            while(cin>>p.first>>p.second)
+                if((p.first>0)&&(p.first<=MAX_VAL)&&(p.second>0)&&(p.second<=MAX_VAL))
+                    break;
+                else
+                    cout<<"ERROR!"<<endl;
+        if(allCan_1stRmLastRmAll(A))
+            cout<<"NO"<<endl;
+        else
+            cout<<"YES"<<endl;
+    }
     return 0;
 }
