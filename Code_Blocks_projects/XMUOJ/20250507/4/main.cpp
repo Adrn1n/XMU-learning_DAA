@@ -33,11 +33,87 @@ xmu
 */
 
 #include <iostream>
+#include <vector>
+#include <stack>
 
 using namespace std;
 
+typedef long long idxT;
+
+enum valT2 {val_a,val_b};
+
+typedef vector<valT2> valT2_Vec;
+
+struct stakNode
+{
+    idxT cnt_a,cnt_b;
+    bool chose_a,isOver;
+};
+
+inline vector<valT2_Vec> enum_allLoc_a_Ge_b(const idxT n)
+{
+    vector<valT2_Vec> Res;
+    valT2_Vec A;
+    stack<stakNode> Stak;
+    do
+    {
+        stakNode node= {0,0,true,false};
+        if(!Stak.empty())
+            node=Stak.top();
+        if(node.isOver)
+            if((node.chose_a)&&(node.cnt_a>(node.cnt_b+1)))
+            {
+                auto &tmp=Stak.top();
+                A.back()=val_b,--(tmp.cnt_a),++(tmp.cnt_b),tmp.chose_a=tmp.isOver=false;
+            }
+            else
+            {
+                A.pop_back(),Stak.pop();
+                if(!Stak.empty())
+                    (Stak.top()).isOver=true;
+            }
+        else
+        {
+            if(node.cnt_a<n)
+                A.push_back(val_a),++(node.cnt_a),node.chose_a=true,Stak.push(node);
+            else if(node.cnt_b<n)
+                A.push_back(val_b),++(node.cnt_b),node.chose_a=false,Stak.push(node);
+            else
+                Res.push_back(A),(Stak.top()).isOver=true;
+        }
+    }
+    while(!Stak.empty());
+    return Res;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT n=0;
+    cin>>n;
+    if(n>0)
+    {
+        auto A=enum_allLoc_a_Ge_b(n);
+        for(auto &a:A)
+        {
+            for(auto &val:a)
+                switch(val)
+                {
+                case val_a:
+                {
+                    cout<<'(';
+                    break;
+                }
+                case val_b:
+                {
+                    cout<<')';
+                    break;
+                }
+                default:
+                    cout<<"ERROR!"<<endl;
+                }
+            cout<<' ';
+        }
+        cout<<endl;
+    }
     return 0;
 }
