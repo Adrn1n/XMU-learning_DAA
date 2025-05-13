@@ -33,11 +33,124 @@ xmu
 */
 
 #include <iostream>
+#include <vector>
+#include <cstdlib>
+#include <stack>
 
 using namespace std;
 
+typedef long long idxT;
+
+typedef vector<idxT> idxVec;
+
+struct stakNode
+{
+    idxT idx;
+    bool isOver;
+};
+
+inline bool isDiag(const idxVec &A,const idxT a,const idxT b)
+{
+    return abs(A[a]-A[b])==abs(a-b);
+}
+
+inline bool isVaild_nQueens_i(const idxVec &A,const idxT i)
+{
+    if(A.size()>(size_t)i)
+    {
+        for(idxT j=0; j<i; ++j)
+            if((A[i]==A[j])||isDiag(A,i,j))
+                return false;
+        return true;
+    }
+    else
+        return false;
+}
+
+inline vector<idxVec> build_nQueens(const idxT n)
+{
+    vector<idxVec> Res;
+    if(n>0)
+    {
+        idxVec A;
+        stack<stakNode> Stak;
+        do
+        {
+            stakNode node= {-1,false};
+            if(!Stak.empty())
+                node=Stak.top();
+            bool flag=true;
+            if(node.isOver)
+            {
+                auto &tmp=Stak.top();
+                for(++A[tmp.idx]; A[tmp.idx]<n; ++A[tmp.idx])
+                    if(isVaild_nQueens_i(A,tmp.idx))
+                    {
+                        tmp.isOver=flag=false;
+                        break;
+                    }
+                if(flag)
+                {
+                    A.pop_back(),Stak.pop();
+                    if(!Stak.empty())
+                        (Stak.top()).isOver=true;
+                }
+            }
+            else
+            {
+                if(A.size()==(size_t)n)
+                    Res.push_back(A);
+                else
+                {
+                    ++(node.idx);
+                    for(idxT i=0; i<n; ++i)
+                    {
+                        A.push_back(i);
+                        if(isVaild_nQueens_i(A,node.idx))
+                        {
+                            Stak.push(node),flag=false;
+                            break;
+                        }
+                        A.pop_back();
+                    }
+                }
+                if(flag&&(!Stak.empty()))
+                    (Stak.top()).isOver=true;
+            }
+        }
+        while(!Stak.empty());
+    }
+    return Res;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT n=0;
+    cin>>n;
+    if(n>0)
+    {
+        auto Res=build_nQueens(n);
+        cout<<'[';
+        for(auto it1=Res.begin(); it1<Res.end(); ++it1)
+        {
+            cout<<'[';
+            for(auto it2=(*it1).begin(); it2<(*it1).end(); ++it2)
+            {
+                cout<<'"';
+                for(idxT i=0; i<n; ++i)
+                    if(i==(*it2))
+                        cout<<'Q';
+                    else
+                        cout<<'.';
+                cout<<'"';
+                if(it2<((*it1).end()-1))
+                    cout<<',';
+            }
+            cout<<']';
+            if(it1<(Res.end()-1))
+                cout<<','<<endl;
+        }
+        cout<<']'<<endl;
+    }
     return 0;
 }
