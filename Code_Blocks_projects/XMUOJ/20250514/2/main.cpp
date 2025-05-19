@@ -49,11 +49,46 @@ xmu
 */
 
 #include <iostream>
+#include <string>
 
 using namespace std;
 
+inline bool couldNumStrIs_generFibo(const string &S)
+{
+    if(S.empty())
+        return true;
+    else
+    {
+        for(auto it=S.begin(); it<S.end(); ++it)
+            if((*it<'0')||(*it>'9'))
+                return false;
+        for(auto it1=S.begin()+1; it1<(S.end()-1); ++it1)
+            for(auto it2=it1+1; it2<S.end(); ++it2)
+            {
+                string s1=string(S.begin(),it1),s2=string(it1,it2),str=string(it2,S.end()),s;
+                for(auto val1=stoll(s1),val2=stoll(s2),val=val1+val2; s=to_string(val),str.rfind(s,0)==0; val1=val2,val2=val,val=val1+val2)
+                {
+                    str=str.substr(s.size());
+                    if(str.empty())
+                        return true;
+                }
+            }
+        return false;
+    }
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    string s;
+    char c;
+    while(cin>>c)
+        if((c>='0')&&(c<='9'))
+            s.push_back(c);
+        else
+            break;
+    if(couldNumStrIs_generFibo(s))
+        cout<<"true"<<endl;
+    else
+        cout<<"false"<<endl;
     return 0;
 }
