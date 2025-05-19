@@ -45,10 +45,39 @@ xmu
 
 #include <iostream>
 
+#define N_MAX 8
+
 using namespace std;
+
+typedef short idxT;
+typedef int cntT;
+
+inline cntT getCnt_nDigDiff(const idxT n)
+{
+    cntT cnt=0;
+    if((n>=0)&&(n<=N_MAX))
+    {
+        cnt=1;
+        if(n>0)
+        {
+            cnt*=9;
+            for(idxT i=0; i<(n-1); ++i)
+                cnt*=(9-i);
+        }
+    }
+    return cnt;
+}
 
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT n=0;
+    cin>>n;
+    if((n>=0)&&(n<=N_MAX))
+    {
+        cntT res=0;
+        for(idxT i=0; i<=n; ++i)
+            res+=getCnt_nDigDiff(i);
+        cout<<res<<endl;
+    }
     return 0;
 }
