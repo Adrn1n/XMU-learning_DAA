@@ -59,11 +59,123 @@ xmu
 */
 
 #include <iostream>
+#include <iomanip>
+#include <vector>
+#include <algorithm>
+#include <stack>
+#include <functional>
+
+#define time24h_N 2
+#define MAX_N 4
 
 using namespace std;
 
+typedef short idxT;
+typedef short cntT;
+typedef short valT;
+
+const cntT time24hN_digsLen[time24h_N]= {2,2};
+const valT Tab_maxVal24hTime[time24h_N]= {23,59};
+
+struct stakNode
+{
+    vector<bool>::iterator it;
+};
+
+inline bool isValid_24hTime(const vector<valT> &Time)
+{
+    if(Time.size()==time24h_N)
+    {
+        for(idxT i=0; i<time24h_N; ++i)
+            if((Time[i]<0)||(Time[i]>Tab_maxVal24hTime[i]))
+                return false;
+        return true;
+    }
+    return false;
+}
+
+inline vector<valT> parse24hTime_digs(const vector<valT> &Digs)
+{
+    vector<valT> Time;
+    auto it=Digs.begin();
+    for(auto len:time24hN_digsLen)
+    {
+        valT t=0;
+        for(cntT j=0; j<len; ++j,++it)
+            if(it<Digs.end())
+                if(t)
+                    t*=10,t+=*it;
+                else
+                    t=*it;
+            else
+                return Time;
+        Time.push_back(t);
+    }
+    return Time;
+}
+
+inline vector<valT> buildMax_24hTime(vector<valT> &Digs)
+{
+    vector<valT> Tmp;
+    sort(Digs.begin(),Digs.end(),greater<valT>());
+    vector<bool> Used(Digs.size());
+    stack<stakNode> Stak;
+    Stak.push({Used.begin()});
+    idxT i=0;
+    cntT j=0;
+    while(!Stak.empty())
+    {
+        bool flag=true;
+        if(i==time24h_N)
+        {
+            auto Time=parse24hTime_digs(Tmp);
+            if(isValid_24hTime(Time))
+                return Time;
+        }
+        else
+        {
+            auto &node=Stak.top();
+            if((node.it)>Used.begin())
+                Tmp.pop_back(),*(node.it-1)=false;
+            for(auto it=node.it; it<Used.end(); ++it)
+                if(!*it)
+                {
+                    Tmp.push_back(Digs[it-Used.begin()]),*it=true,Stak.push({Used.begin()}),node.it=it+1,flag=false;
+                    if(++j==time24hN_digsLen[i])
+                        ++i,j=0;
+                    break;
+                }
+        }
+        if(flag)
+        {
+            Stak.pop();
+            if(--j==-1)
+            {
+                --i;
+                if(i>=0)
+                    j=(cntT)(time24hN_digsLen[i]-1);
+            }
+        }
+    }
+    return Tmp;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    vector<valT> Digs;
+    while(Digs.size()<MAX_N)
+    {
+        valT a=0;
+        cin>>a,Digs.push_back(a);
+    }
+    auto max24hTime=buildMax_24hTime(Digs);
+    for(auto it=max24hTime.begin(); it<max24hTime.end(); ++it)
+    {
+        cout<<setfill('0')<<setw(time24hN_digsLen[it-max24hTime.begin()])<<*it;
+        if(it<(max24hTime.end()-1))
+            cout<<':';
+        else
+            cout<<endl;
+    }
     return 0;
 }
