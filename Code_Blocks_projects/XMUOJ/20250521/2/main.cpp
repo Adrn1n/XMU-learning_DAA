@@ -38,11 +38,106 @@ xmu
 */
 
 #include <iostream>
+#include <vector>
+#include <queue>
+#include <unordered_map>
+
+#define K_MAX 15
+#define a_MAX 1000
 
 using namespace std;
 
+typedef short idxT;
+typedef short valT;
+
+typedef vector<valT> valVec;
+
+struct queNode
+{
+    vector<bool> Chose;
+    idxT cnt;
+    valT val;
+};
+
+inline bool isPosible_node(const queNode &node,unordered_map<vector<bool>,valT> &curState_max)
+{
+    auto mapIt=curState_max.find(node.Chose);
+    bool flag=false;
+    if(mapIt==curState_max.end())
+        curState_max[node.Chose]=node.val,flag=true;
+    else if(node.val>=(mapIt->second))
+        mapIt->second=node.val,flag=true;
+    return flag;
+}
+
+inline valT getMax_nItmKPos(const vector<valVec> &A,const idxT k)
+{
+    valT res=0;
+    if(A.size()>=(size_t)k)
+    {
+        bool flag=true;
+        for(auto &vec:A)
+            if(vec.size()!=(size_t)k)
+            {
+                flag=false;
+                break;
+            }
+        if(flag)
+        {
+            unordered_map<vector<bool>,valT> curState_max;
+            queue<queNode> Que;
+            Que.push({vector<bool>(A.size()),0,0});
+            while(!Que.empty())
+            {
+                auto &node=Que.front();
+                if((node.cnt)++<k)
+                {
+                    if(isPosible_node(node,curState_max))
+                    {
+                        auto &Chose=node.Chose;
+                        for(auto it=Chose.begin(); it<Chose.end(); ++it)
+                            if(!(*it))
+                            {
+                                *it=true,node.val+=A[it-Chose.begin()][node.cnt-1];
+                                if(isPosible_node(node,curState_max))
+                                    Que.push(node);
+                                *it=false,node.val-=A[it-Chose.begin()][node.cnt-1];
+                            }
+                    }
+                }
+                else
+                    res=(node.val>res)?(node.val):res;
+                Que.pop();
+            }
+        }
+    }
+    return res;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT k=0;
+    cin>>k;
+    bool flag=true;
+    if((k>0)&&(k<=K_MAX))
+    {
+        vector<valVec> A(k,valVec(k));
+        for(auto &vec:A)
+            for(auto &val:vec)
+            {
+                cin>>val;
+                if((val<0)||(val>a_MAX))
+                {
+                    flag=false;
+                    break;
+                }
+            }
+        if(flag)
+            cout<<getMax_nItmKPos(A,k)<<endl;
+    }
+    else
+        flag=false;
+    if(!flag)
+        cout<<"ERROR!"<<endl;
     return 0;
 }

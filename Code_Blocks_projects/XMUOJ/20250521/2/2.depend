@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1748080135 source:e:\files\xmu\learning\daa\code_blocks_projects\xmuoj\20250521\2\main.cpp
+	<iostream>
+	<vector>
+	<queue>
+	<unordered_map>
+
