@@ -61,8 +61,8 @@ struct queNode
 
 inline bool isPosible_node(const queNode &node,unordered_map<vector<bool>,valT> &curState_max)
 {
-    auto mapIt=curState_max.find(node.Chose);
     bool flag=false;
+    auto mapIt=curState_max.find(node.Chose);
     if(mapIt==curState_max.end())
         curState_max[node.Chose]=node.val,flag=true;
     else if(node.val>=(mapIt->second))

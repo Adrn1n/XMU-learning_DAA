@@ -42,11 +42,117 @@ xmu
 */
 
 #include <iostream>
+#include <vector>
+#include <queue>
+#include <unordered_map>
+
+#define N_MIN 2
+#define N_MAX 12
+#define T_MAX 10000
 
 using namespace std;
 
+typedef short idxT;
+typedef int valT;
+
+typedef vector<valT> valVec;
+typedef unordered_map<vector<bool>,valT> bV2val_map;
+
+struct queNode
+{
+    vector<bool> Visit;
+    idxT idx,cnt;
+    valT val;
+};
+
+inline bool isPosible_node(const queNode &node,vector<bV2val_map> &curState_min)
+{
+    bool flag=false;
+    if((node.idx>=0)&&((size_t)(node.idx)<curState_min.size()))
+    {
+        auto mapIt=curState_min[node.idx].find(node.Visit);
+        if(mapIt==curState_min[node.idx].end())
+            (curState_min[node.idx])[node.Visit]=node.val,flag=true;
+        else if(node.val<=(mapIt->second))
+            mapIt->second=node.val,flag=true;
+    }
+    return flag;
+}
+
+inline valT getMin_hamiltonianCircuitDG(const vector<valVec> &adjTab,const idxT startIdx)
+{
+    valT res=-1;
+    auto n=(idxT)(adjTab.size());
+    if((startIdx>=0)&&(startIdx<n))
+    {
+        bool flag=true;
+        for(auto &vec:adjTab)
+            if(vec.size()!=(size_t)n)
+            {
+                flag=false;
+                break;
+            }
+        if(flag)
+        {
+            vector<bV2val_map> CurStateMin(n);
+            queue<queNode> Que;
+            Que.push({vector<bool>(n),startIdx,0,0});
+            while(!Que.empty())
+            {
+                auto &node=Que.front();
+                if(++(node.cnt)<n)
+                {
+                    if(isPosible_node(node,CurStateMin))
+                    {
+                        auto &Vis=node.Visit;
+                        for(idxT i=0; i<n; ++i)
+                            if((!Vis[i])&&(i!=startIdx)&&(adjTab[node.idx][i]))
+                            {
+                                auto tmp=node.idx;
+                                Vis[i]=true,node.idx=i,node.val+=adjTab[tmp][i];
+                                if(isPosible_node(node,CurStateMin))
+                                    Que.push(node);
+                                Vis[i]=false,node.idx=tmp,node.val-=adjTab[tmp][i];
+                            }
+                    }
+                }
+                else
+                    (node.val)+=adjTab[node.idx][startIdx],res=((node.val<res)||(res==-1))?(node.val):res;
+                Que.pop();
+            }
+        }
+    }
+    return res;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT n=0,s=0;
+    cin>>n;
+    bool flag=false;
+    if((n>=N_MIN)&&(n<=N_MAX))
+    {
+        vector<valVec> adjTab(n,valVec(n));
+        for(auto &vec:adjTab)
+            for(auto &val:vec)
+            {
+                cin>>val;
+                if((val<0)||(val>T_MAX))
+                {
+                    flag=true;
+                    break;
+                }
+            }
+        if(!flag)
+        {
+            cin>>s;
+            if((s>0)&&(s<=n))
+                cout<<getMin_hamiltonianCircuitDG(adjTab,(idxT)(s-1))<<endl;
+            else
+                flag=true;
+        }
+    }
+    if(flag)
+        cout<<"ERROR!"<<endl;
     return 0;
 }
