@@ -38,11 +38,80 @@ xmu
 */
 
 #include <iostream>
+#include <vector>
+#include <queue>
+
+#define N_MAX 100
+#define W_MAX 100000
+#define S_MAX 10000
 
 using namespace std;
 
+typedef short idxT;
+typedef int WT;
+typedef short ST;
+
+struct Hero
+{
+    WT c;
+    ST s;
+};
+
+struct queNode
+{
+    vector<Hero>::const_iterator it;
+    WT C;
+    ST S;
+};
+
+inline ST getMaxS_sumHerosCstLeW(const vector<Hero> &Heros,const WT W)
+{
+    ST res=0;
+    queue<queNode> Que;
+    queNode node= {Heros.begin(),0,0};
+    do
+        if(Que.empty())
+            Que.push(node);
+        else
+        {
+            node=Que.front(),Que.pop();
+            if(node.it==Heros.end())
+                res=(node.S>res)?(node.S):res;
+            else
+            {
+                ++(node.it),Que.push(node);
+                if((node.C+=((node.it-1)->c))<=W)
+                    node.S+=((node.it-1)->s),Que.push(node);
+            }
+        }
+    while(!Que.empty());
+    return res;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT n=0;
+    WT W=0;
+    cin>>n>>W;
+    bool flag=true;
+    if((n>0)&&(n<=N_MAX)&&(W>0)&&(W<=W_MAX))
+    {
+        vector<Hero> Heros(n);
+        for(auto &hero:Heros)
+        {
+            cin>>hero.c>>hero.s;
+            if((hero.c<=0)||(hero.c>W)||(hero.s<=0)||(hero.s>S_MAX))
+            {
+                flag=false;
+                break;
+            }
+        }
+        if(flag)
+            cout<<getMaxS_sumHerosCstLeW(Heros,W)<<endl;
+    }
+    else
+        flag=false;
+    if(!flag)
+        cout<<"ERROR"<<endl;
     return 0;
 }
