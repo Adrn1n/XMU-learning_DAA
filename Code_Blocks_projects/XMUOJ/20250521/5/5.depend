@@ -1,4 +1,8 @@
 # depslib dependency file v1.0
-1748144970 source:e:\files\xmu\learning\daa\code_blocks_projects\xmuoj\20250521\5\main.cpp
+1748157283 source:e:\files\xmu\learning\daa\code_blocks_projects\xmuoj\20250521\5\main.cpp
 	<iostream>
+	<forward_list>
+	<iterator>
+	<queue>
+	<map>
 
