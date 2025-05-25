@@ -132,8 +132,8 @@ int main()
     bool flag=false;
     if((n>=N_MIN)&&(n<=N_MAX))
     {
-        vector<valVec> adjTab(n,valVec(n));
-        for(auto &vec:adjTab)
+        vector<valVec> t(n,valVec(n));
+        for(auto &vec:t)
             for(auto &val:vec)
             {
                 cin>>val;
@@ -147,7 +147,7 @@ int main()
         {
             cin>>s;
             if((s>0)&&(s<=n))
-                cout<<getMin_hamiltonianCircuitDG(adjTab,(idxT)(s-1))<<endl;
+                cout<<getMin_hamiltonianCircuitDG(t,(idxT)(s-1))<<endl;
             else
                 flag=true;
         }

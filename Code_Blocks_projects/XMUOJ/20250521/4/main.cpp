@@ -46,11 +46,104 @@ xmu
 */
 
 #include <iostream>
+#include <vector>
+#include <queue>
+#include <unordered_map>
+
+#define N_MIN 1
+#define N_MAX 20
+#define K_MIN 1
+#define HT_MIN 1
+#define HT_MAX 100000
+#define VT_MIN 1
+#define VT_MAX 10000
 
 using namespace std;
 
+typedef short idxT;
+typedef int HT;
+typedef int VT;
+
+struct nodeT
+{
+    HT h;
+    VT v;
+};
+
+struct queNode
+{
+    idxT cnt;
+    VT val;
+    vector<bool> Chose;
+};
+
+inline bool isPosible_node(const queNode &node,unordered_map<vector<bool>,VT> &curState_max)
+{
+    bool flag=false;
+    auto mapIt=curState_max.find(node.Chose);
+    if(mapIt==curState_max.end())
+        curState_max[node.Chose]=node.val,flag=true;
+    else if(node.val>=(mapIt->second))
+        mapIt->second=node.val,flag=true;
+    return flag;
+}
+
+inline VT getMaxVal_nodeNHLEM(const vector<nodeT> &A,const idxT n,const HT m)
+{
+    VT res=0;
+    unordered_map<vector<bool>,VT> curState_max;
+    queue<queNode> Que;
+    Que.push({0,0,vector<bool>(A.size())});
+    while(!Que.empty())
+    {
+        auto &node=Que.front();
+        bool flag=true;
+        if((node.cnt)++<n)
+        {
+            if(isPosible_node(node,curState_max))
+            {
+                auto &Chose=node.Chose;
+                for(idxT i=0; (size_t)i<(A.size()); ++i)
+                    if((!Chose[i])&&(A[i].h<=m))
+                    {
+                        Chose[i]=true,node.val+=A[i].v,flag=false;
+                        if(isPosible_node(node,curState_max))
+                            Que.push(node);
+                        Chose[i]=false,node.val-=A[i].v;
+                    }
+            }
+        }
+        if(flag)
+            res=(node.val>res)?(node.val):res;
+        Que.pop();
+    }
+    return res;
+}
+
 int main()
 {
-    cout << "Hello world!" << endl;
+    idxT n=0,K=0;
+    HT D=0;
+    cin>>n>>K>>D;
+    bool flag=true;
+    if((n>=N_MIN)&&(n<=N_MAX)&&(K>=K_MIN)&&(K<=n)&&(D>=HT_MIN)&&(D<=HT_MAX))
+    {
+        vector<nodeT> A(n);
+        for(auto &node:A)
+        {
+            cin>>node.h>>node.v;
+            if((node.h<HT_MIN)||(node.h>HT_MAX)||(node.v<VT_MIN)||(node.v>VT_MAX))
+            {
+                flag=false;
+                break;
+            }
+        }
+        if(flag)
+            cout<<getMaxVal_nodeNHLEM(A,K,D)<<endl,flag=false;
+        else
+            flag=true;
+    }
+    if(flag)
+        cout<<"ERROR!"<<endl;
     return 0;
 }
